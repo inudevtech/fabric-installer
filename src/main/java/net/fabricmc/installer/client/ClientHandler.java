@@ -110,7 +110,7 @@ public class ClientHandler extends Handler {
 						throw new RuntimeException(Utils.BUNDLE.getString("progress.exception.no.launcher.profile"));
 					}
 
-					profileInstaller.setupProfile(profileName, gameVersion, launcherType);
+					profileInstaller.setupProfile(profileName, gameVersion, launcherType, gamePath);
 				}
 
 				SwingUtilities.invokeLater(() -> showInstalledMessage(loaderVersion.name, gameVersion));
@@ -215,7 +215,7 @@ public class ClientHandler extends Handler {
 			}
 		}
 
-		profileInstaller.setupProfile(profileName, gameVersion, launcherType);
+		profileInstaller.setupProfile(profileName, gameVersion, launcherType, gamePath);
 	}
 
 	@Override

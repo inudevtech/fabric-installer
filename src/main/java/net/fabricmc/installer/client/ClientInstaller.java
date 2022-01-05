@@ -90,8 +90,11 @@ public class ClientInstaller {
 
 		if (optifine) {
 			Path optifineJar = modsDir.resolve("optifine.jar");
-			URL optifineUrl = new URL("https://optifine.net/downloadx?f=OptiFine_1.17.1_HD_U_H1.jar&x=e0a94f8215ca1136a7a484133e9dcea9");
+			URL optifineUrl = new URL("https://data.arainu.world/files/OptiFine_1.17.1_HD_U_H1.jar");
 			Utils.downloadFile(optifineUrl, optifineJar);
+			Path optifabricJar = modsDir.resolve("optifine.jar");
+			URL optifabricURL = new URL("https://data.arainu.world/files/optifabric-1.12.10.jar");
+			Utils.downloadFile(optifabricURL, optifabricJar);
 		}
 
 		progress.updateProgress(Utils.BUNDLE.getString("progress.done"));

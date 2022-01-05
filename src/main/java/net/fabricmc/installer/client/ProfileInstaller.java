@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 import mjson.Json;
 
-import net.fabricmc.installer.util.Reference;
 import net.fabricmc.installer.util.Utils;
 
 public class ProfileInstaller {
@@ -43,7 +42,7 @@ public class ProfileInstaller {
 				.collect(Collectors.toList());
 	}
 
-	public void setupProfile(String name, String gameVersion, LauncherType launcherType) throws IOException {
+	public void setupProfile(String name, String gameVersion, LauncherType launcherType, Path gameDir) throws IOException {
 		Path launcherProfiles = mcDir.resolve(launcherType.profileJsonName);
 
 		if (!Files.exists(launcherProfiles)) {
@@ -61,12 +60,12 @@ public class ProfileInstaller {
 			jsonObject.set("profiles", profiles);
 		}
 
-		String profileName = Reference.LOADER_NAME + "-" + gameVersion;
+		String profileName = "Mobを仲間にするマインクラフト - " + gameVersion;
 
 		Json profile = profiles.at(profileName);
 
 		if (profile == null) {
-			profile = createProfile(profileName);
+			profile = createProfile(profileName, gameDir);
 			profiles.set(profileName, profile);
 		}
 
@@ -75,13 +74,14 @@ public class ProfileInstaller {
 		Utils.writeToFile(launcherProfiles, jsonObject.toString());
 	}
 
-	private static Json createProfile(String name) {
+	private static Json createProfile(String name, Path gameDir) {
 		Json jsonObject = Json.object();
 		jsonObject.set("name", name);
 		jsonObject.set("type", "custom");
 		jsonObject.set("created", Utils.ISO_8601.format(new Date()));
 		jsonObject.set("lastUsed", Utils.ISO_8601.format(new Date()));
 		jsonObject.set("icon", Utils.getProfileIcon());
+		jsonObject.set("gameDir", gameDir.toAbsolutePath().toString());
 		return jsonObject;
 	}
 
