@@ -92,7 +92,7 @@ public class ClientInstaller {
 			Path optifineJar = modsDir.resolve("optifine.jar");
 			URL optifineUrl = new URL("https://data.arainu.world/files/OptiFine_1.17.1_HD_U_H1.jar");
 			Utils.downloadFile(optifineUrl, optifineJar);
-			Path optifabricJar = modsDir.resolve("optifine.jar");
+			Path optifabricJar = modsDir.resolve("optifabric.jar");
 			URL optifabricURL = new URL("https://data.arainu.world/files/optifabric-1.12.10.jar");
 			Utils.downloadFile(optifabricURL, optifabricJar);
 		}
