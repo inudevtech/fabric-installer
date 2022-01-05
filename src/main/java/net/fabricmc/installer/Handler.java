@@ -28,7 +28,6 @@ import java.util.function.Consumer;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
@@ -52,12 +51,12 @@ public abstract class Handler implements InstallerProgress {
 	public JComboBox<String> gameVersionComboBox;
 	private JComboBox<String> loaderVersionComboBox;
 	public JTextField installLocation;
+	public JTextField profileLocation;
 	public JButton selectFolderButton;
 	public JLabel statusLabel;
 
-	public JCheckBox snapshotCheckBox;
-
 	private JPanel pane;
+	private JButton selectFolderButton2;
 
 	public abstract String name();
 
@@ -81,13 +80,6 @@ public abstract class Handler implements InstallerProgress {
 		addRow(pane, jPanel -> {
 			jPanel.add(new JLabel(Utils.BUNDLE.getString("prompt.game.version")));
 			jPanel.add(gameVersionComboBox = new JComboBox<>());
-			jPanel.add(snapshotCheckBox = new JCheckBox(Utils.BUNDLE.getString("option.show.snapshots")));
-			snapshotCheckBox.setSelected(false);
-			snapshotCheckBox.addActionListener(e -> {
-				if (Main.GAME_VERSION_META.isComplete()) {
-					updateGameVersions();
-				}
-			});
 		});
 
 		Main.GAME_VERSION_META.onComplete(versions -> {
@@ -105,7 +97,16 @@ public abstract class Handler implements InstallerProgress {
 			jPanel.add(selectFolderButton = new JButton());
 
 			selectFolderButton.setText("...");
-			selectFolderButton.addActionListener(e -> InstallerGui.selectInstallLocation(() -> installLocation.getText(), s -> installLocation.setText(s)));
+			selectFolderButton.addActionListener(e -> InstallerGui.selectInstallLocation(() -> installLocation.getText(), s -> installLocation.setText(s), Utils.BUNDLE.getString("prompt.select.location")));
+		});
+
+		addRow(pane, jPanel -> {
+			jPanel.add(new JLabel(Utils.BUNDLE.getString("prompt.select.location2")));
+			jPanel.add(profileLocation = new JTextField());
+			jPanel.add(selectFolderButton2 = new JButton());
+
+			selectFolderButton2.setText("...");
+			selectFolderButton2.addActionListener(e -> InstallerGui.selectInstallLocation(() -> profileLocation.getText(), s -> profileLocation.setText(s), Utils.BUNDLE.getString("prompt.select.location2")));
 		});
 
 		setupPane2(pane, installerGui);
@@ -153,7 +154,7 @@ public abstract class Handler implements InstallerProgress {
 		gameVersionComboBox.removeAllItems();
 
 		for (MetaHandler.GameVersion version : Main.GAME_VERSION_META.getVersions()) {
-			if (!snapshotCheckBox.isSelected() && !version.isStable()) {
+			if (!version.getVersion().equals("1.17.1")) {
 				continue;
 			}
 
@@ -207,7 +208,7 @@ public abstract class Handler implements InstallerProgress {
 		return String.format(
 				"font-family:%s;font-weight:%s;font-size:%dpt;background-color: rgb(%d,%d,%d);",
 				font.getFamily(), (font.isBold() ? "bold" : "normal"), font.getSize(), color.getRed(), color.getGreen(), color.getBlue()
-				);
+		);
 	}
 
 	@Override

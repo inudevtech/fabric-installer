@@ -49,10 +49,10 @@ public class InstallerGui extends JFrame {
 		Main.LOADER_META.load();
 	}
 
-	public static void selectInstallLocation(Supplier<String> initalDir, Consumer<String> selectedDir) {
+	public static void selectInstallLocation(Supplier<String> initalDir, Consumer<String> selectedDir, String title) {
 		JFileChooser chooser = new JFileChooser();
 		chooser.setCurrentDirectory(new File(initalDir.get()));
-		chooser.setDialogTitle(Utils.BUNDLE.getString("prompt.select.location"));
+		chooser.setDialogTitle(title);
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		chooser.setAcceptAllFileFilterUsed(false);
 

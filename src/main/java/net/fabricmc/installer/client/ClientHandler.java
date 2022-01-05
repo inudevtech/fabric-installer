@@ -43,6 +43,7 @@ import net.fabricmc.installer.util.Utils;
 
 public class ClientHandler extends Handler {
 	private JCheckBox createProfile;
+	private JCheckBox addOptifine;
 
 	@Override
 	public String name() {
@@ -75,6 +76,12 @@ public class ClientHandler extends Handler {
 					throw new RuntimeException(Utils.BUNDLE.getString("progress.exception.no.launcher.directory"));
 				}
 
+				Path gamePath = Paths.get(profileLocation.getText());
+
+				if (!Files.exists(gamePath)) {
+					throw new RuntimeException(Utils.BUNDLE.getString("progress.exception.no.profile.directory"));
+				}
+
 				final ProfileInstaller profileInstaller = new ProfileInstaller(mcPath);
 				ProfileInstaller.LauncherType launcherType = null;
 
@@ -96,7 +103,7 @@ public class ClientHandler extends Handler {
 					}
 				}
 
-				String profileName = ClientInstaller.install(mcPath, gameVersion, loaderVersion, this);
+				String profileName = ClientInstaller.install(mcPath, gamePath, gameVersion, loaderVersion, this);
 
 				if (createProfile.isSelected()) {
 					if (launcherType == null) {
@@ -137,7 +144,7 @@ public class ClientHandler extends Handler {
 	}
 
 	private ProfileInstaller.LauncherType showLauncherTypeSelection() {
-		Object[] options = { Utils.BUNDLE.getString("prompt.launcher.type.xbox"), Utils.BUNDLE.getString("prompt.launcher.type.win32")};
+		Object[] options = {Utils.BUNDLE.getString("prompt.launcher.type.xbox"), Utils.BUNDLE.getString("prompt.launcher.type.win32")};
 
 		int result = JOptionPane.showOptionDialog(null,
 				Utils.BUNDLE.getString("prompt.launcher.type.body"),
@@ -174,10 +181,16 @@ public class ClientHandler extends Handler {
 			throw new FileNotFoundException("Launcher directory not found at " + path);
 		}
 
+		Path gamePath = Paths.get(profileLocation.getText());
+
+		if (!Files.exists(gamePath)) {
+			throw new FileNotFoundException("Profile directory not found at " + gamePath);
+		}
+
 		String gameVersion = getGameVersion(args);
 		LoaderVersion loaderVersion = new LoaderVersion(getLoaderVersion(args));
 
-		String profileName = ClientInstaller.install(path, gameVersion, loaderVersion, InstallerProgress.CONSOLE);
+		String profileName = ClientInstaller.install(path, gamePath, gameVersion, loaderVersion, InstallerProgress.CONSOLE);
 
 		if (args.has("noprofile")) {
 			return;
@@ -216,8 +229,12 @@ public class ClientHandler extends Handler {
 
 	@Override
 	public void setupPane2(JPanel pane, InstallerGui installerGui) {
-		addRow(pane, jPanel -> jPanel.add(createProfile = new JCheckBox(Utils.BUNDLE.getString("option.create.profile"), true)));
+		addRow(pane, jPanel -> {
+			jPanel.add(createProfile = new JCheckBox(Utils.BUNDLE.getString("option.create.profile"), true));
+			jPanel.add(addOptifine = new JCheckBox(Utils.BUNDLE.getString("option.add.optifine"), true));
+		});
 
 		installLocation.setText(Utils.findDefaultInstallDir().toString());
+		profileLocation.setText(Utils.findDefaultInstallDir().toString());
 	}
 }
