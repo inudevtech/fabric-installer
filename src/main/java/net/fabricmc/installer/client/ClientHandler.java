@@ -103,7 +103,7 @@ public class ClientHandler extends Handler {
 					}
 				}
 
-				String profileName = ClientInstaller.install(mcPath, gamePath, gameVersion, loaderVersion, this);
+				String profileName = ClientInstaller.install(mcPath, gamePath, gameVersion, loaderVersion, this, addOptifine.isSelected());
 
 				if (createProfile.isSelected()) {
 					if (launcherType == null) {
@@ -190,7 +190,7 @@ public class ClientHandler extends Handler {
 		String gameVersion = getGameVersion(args);
 		LoaderVersion loaderVersion = new LoaderVersion(getLoaderVersion(args));
 
-		String profileName = ClientInstaller.install(path, gamePath, gameVersion, loaderVersion, InstallerProgress.CONSOLE);
+		String profileName = ClientInstaller.install(path, gamePath, gameVersion, loaderVersion, InstallerProgress.CONSOLE, args.has("optifine"));
 
 		if (args.has("noprofile")) {
 			return;

@@ -16,10 +16,13 @@
 
 package net.fabricmc.installer.client;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 
 import net.fabricmc.installer.LoaderVersion;
 import net.fabricmc.installer.util.InstallerProgress;
@@ -27,7 +30,7 @@ import net.fabricmc.installer.util.Reference;
 import net.fabricmc.installer.util.Utils;
 
 public class ClientInstaller {
-	public static String install(Path mcDir, Path gameDir, String gameVersion, LoaderVersion loaderVersion, InstallerProgress progress) throws IOException {
+	public static String install(Path mcDir, Path gameDir, String gameVersion, LoaderVersion loaderVersion, InstallerProgress progress, Boolean optifine) throws IOException {
 		System.out.println(gameDir);
 		System.out.println("Installing " + gameVersion + " with fabric " + loaderVersion.name);
 
@@ -55,6 +58,41 @@ public class ClientInstaller {
 
 		URL profileUrl = new URL(Reference.getMetaServerEndpoint(String.format("v2/versions/loader/%s/%s/profile/json", gameVersion, loaderVersion.name)));
 		Utils.downloadFile(profileUrl, profileJson);
+
+		/*
+		ここから魔改造ライン
+		 */
+		Path modsDir = gameDir.resolve("mods");
+
+		if (!Files.exists(modsDir)) {
+			Files.createDirectories(modsDir);
+		} else {
+			File[] listFiles = Objects.requireNonNull(modsDir.toFile().listFiles());
+
+			if (listFiles.length != 0) {
+				Path oldFileDir = modsDir.resolve("old_files");
+				if (!Files.exists(oldFileDir)) Files.createDirectories(oldFileDir);
+
+				for (File i : listFiles) {
+					if (!i.toPath().equals(oldFileDir)) {
+						Files.move(i.toPath(), oldFileDir.resolve(i.getName()), StandardCopyOption.REPLACE_EXISTING);
+					}
+				}
+			}
+		}
+
+		Path APIJar = modsDir.resolve("fabric-api.jar");
+		Path identityJar = modsDir.resolve("identity.jar");
+		URL APIUrl = new URL("https://github.com/FabricMC/fabric/releases/download/0.45.1%2B1.17/fabric-api-0.45.1+1.17.jar");
+		Utils.downloadFile(APIUrl, APIJar);
+		URL identityUrl = new URL("https://github.com/Draylar/identity/releases/download/1.15.2-1.17.1-fabric/identity-1.15.2-1.17.1.jar");
+		Utils.downloadFile(identityUrl, identityJar);
+
+		if (optifine) {
+			Path optifineJar = modsDir.resolve("optifine.jar");
+			URL optifineUrl = new URL("https://optifine.net/downloadx?f=OptiFine_1.17.1_HD_U_H1.jar&x=e0a94f8215ca1136a7a484133e9dcea9");
+			Utils.downloadFile(optifineUrl, optifineJar);
+		}
 
 		progress.updateProgress(Utils.BUNDLE.getString("progress.done"));
 
